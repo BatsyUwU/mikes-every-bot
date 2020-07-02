@@ -1,0 +1,13 @@
+json.sqlite
+.env
+config.json
+.npmignore
+module.exports.md
+logs
+application.yml
+ex.js
+shard.js
+server.js
+vars.js
+node_modules
+Lavalink.jar

@@ -1,0 +1,21 @@
+# Log Files
+json.sqlite
+logs
+spring.log
+ex.js
+nohup.out
+# Config Files
+.env
+config.json
+
+# Regular files
+bruh.txt
+lock.js
+node_modules
+
+
+# Testing Files
+test.ts
+test.js
+tsconfig.json
+module.exports.md

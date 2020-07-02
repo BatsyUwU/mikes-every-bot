@@ -1,0 +1,9 @@
+{
+    "[javascript]": {
+        "breadcrumbs.showBooleans": true,
+        "breadcrumbs.showArrays": true,
+        "breadcrumbs.showFunctions": true
+
+
+    }
+}
