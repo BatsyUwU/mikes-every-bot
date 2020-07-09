@@ -26,7 +26,7 @@ const fs = require("fs");
     
     bot.music = new ErelaClient(bot, [
         {
-            host: process.env.HOST,
+            host: "localhost",
             port: process.env.PORT,
             password: process.env.PASSWORD
         }

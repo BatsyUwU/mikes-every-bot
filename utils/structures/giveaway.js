@@ -5,7 +5,7 @@ const schedule = require("node-schedule")
 const {MessageEmbed} = require("discord.js")
 async function saveGiveaway(response) {
     const {
-        title, prize, winners, duration, guildId, messageId, channelId, endsOn, host, isNewGiveaway, edited
+        title, prize, winners, duration, guildId, messageId,serverar ,channelId, endsOn, host, isNewGiveaway, Resolved, edited, timer, rolereqs, serverreqs
     } = response;
 
     const giveaway = new Giveaway({
@@ -15,11 +15,15 @@ async function saveGiveaway(response) {
         duration, 
         guildId, 
         messageId, 
+        serverar,
         channelId, 
         endsOn,
         host,
         edited: edited,
+        rolereqs: rolereqs,
+        serverreqs: serverreqs,
         isNewGiveaway: isNewGiveaway,
+        Resolved: Resolved,
         createdOn: new Date(),
     });
     return giveaway.save();
@@ -113,24 +117,30 @@ async function scheduleGiveaways(client, giveaways){
                         if(embeds.length === 1){
                             const embed = embeds[0];
                             if(entries.length <= 0) {
-                                embed.setTitle(`No winners have been found :(`)
-                                embed.setDescription(`Looks like i could'nt find a winner for this giveaway ):`)
-                                embed.setColor('BLURPLE')
-                                embed.setFooter(`Hey, since no one won maybe ill take the prize for myself hehe`)
-                            return message.edit(embed)
+                                const e = new MessageEmbed()
+                                .setTitle(`No winners have been found :(`)
+                                .setDescription(`Looks like i could'nt find a winner for this giveaway ):`)
+                               .setColor('BLURPLE')
+                            .setFooter(`Hey, since no one won maybe ill take the prize for myself hehe`)
+                            await Giveaway.deleteOne({ channelId: channelId, messageId: messageId, endsOn: endsOn, prize: prize, host: host}).then(console.log).catch(console.log)
+                           
+                            return message.edit(e)
                             }
                             let winners = determineWinners(entries, giveaways[i].winners)
                             winners = winners.map(user => user.toString()).join(', ')
-                            embed.setTitle(`This giveaway has now ended!`)
-                            embed.setDescription(`${prize}\n\n\nWinner(s): ${winners}\nHost: ${host}`)
-                            embed.setColor(embed.color)
-                            embed.setFooter(`This giveaway ended at`)
-                            embed.setTimestamp()
+                           const em = new MessageEmbed()
+                            .setTitle(prize)
+                            .setDescription(`${entries.length === 1 ? "Winner" : "Winners"}: ${winners}\nHost: ${host}`)
+                            .setColor('BLURPLE')
+                            .setFooter(`Ended at`)
+                            .setTimestamp()
                             const v = new MessageEmbed()
                             v.setDescription(`[Giveaway Link](https://discord.com/channels/${message.guild.id}/${channelId}/${message.id})`)
-                            v.setColor(embed.color)
-                            await message.edit(embed)
-                            await message.channel.send(`Congrats ${winners} you won the giveaway for **${prize}**!`, v)
+                            v.setColor('BLURPLE')
+                            await message.edit("\u200B", em)
+                            await message.channel.send(`Congrats ${winners} you won the giveaway for **${prize}**!`, v);
+                            await Giveaway.deleteOne({ channelId: channelId, messageId: messageId, endsOn: endsOn, prize: prize, host: host}).then(console.log).catch(console.log)
+                            clearInterval(giveaways[i].timer)
                         }
                     }
                 }

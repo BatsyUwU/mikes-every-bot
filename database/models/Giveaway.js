@@ -12,7 +12,11 @@ const GiveawaySchema = new mongoose.Schema({
     isNewGiveaway: { type: Boolean, required: true},
     edited: { type: Boolean, required: true},
     duration: { type: String, required: true},
-    host: {type: String, required: true}
+    host: {type: String, required: true},
+    serverar: Array,
+    rolereqs: mongoose.Schema.Types.Mixed,
+    serverreqs: mongoose.Schema.Types.Mixed,
+    Resolved: Boolean
 });
 
 const Giveaway = module.exports = mongoose.model(`Giveaway`, GiveawaySchema);

@@ -47,16 +47,18 @@ module.exports=async(bot,message)=>{
            else{
         
             
-
+        
             if(command.timeout){
                 if(Timeout.has(`${message.author.id}${command.name}`)){
+                    
                         var embed = new MessageEmbed()
                         embed.setTitle(`${command.name[0].toUpperCase() + command.name.slice(1)} is under cooldown!`)
                         embed.setColor("RED")
-                        embed.setDescription(`You can only use this command every **${ms(command.timeout, { long: true})}**`)
+                        embed.setDescription(`You can only use this command in **${ms(command.timeout, { long: true})}**`)
                     return message.channel.send(embed)
                 } else {
                     Timeout.add(`${message.author.id}${command.name}`)
+                    initiaded = command.timeout;
                     setTimeout(()=>{
                         Timeout.delete(`${message.author.id}${command.name}`)
                     }, command.timeout)

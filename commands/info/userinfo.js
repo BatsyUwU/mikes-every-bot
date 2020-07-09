@@ -3,6 +3,7 @@ const Util = require("../../utils/Util");
 const { stripIndents } = require("common-tags")
 const modRoleSchema = require("../../database/models/ModRole");
 const ms = require("ms");
+const humanizeDuration  = require('humanize-duration');
 module.exports = {
     name: "userinfo",
     aliases: ['whois'],
@@ -35,6 +36,7 @@ module.exports = {
                 Bot?: \`${member.user.bot == true ? "Yes" : "No"}\`
                 Avatar: [jpeg](${member.user.displayAvatarURL({ format: "jpeg"})}) | [png](${member.user.displayAvatarURL({ format: "png"})}) | [gif](${member.user.displayAvatarURL({ dynamic: true})}) | [webp](${member.user.displayAvatarURL({ format: "webp"})})
                 Registered At: \`${new Date(member.user.createdAt).toLocaleString("en-US")}\`
+                Registered For: ${humanizeDuration(Date.now() - message.author.createdAt, { round: true})}
                 Status: \`${statuses[member.user.presence.status]}\`
                 Device: \`${member.user.presence.clientStatus ? member.user.presence.clientStatus.mobile !== null ? "Mobile" : member.user.presence.clientStatus.web !== null ? "Web" : member.user.presence.clientStatus.desktop !== null ? "Desktop" : "Currently Unfound": "Currently Unfound"}\`
                 Activites: \`${member.user.presence.activities.map(a => `Type: ${a.type.toLowerCase().replace(/_/g, " ")}, Name: ${a.name}`).join("\n")}\`
@@ -44,9 +46,9 @@ module.exports = {
             .addField(`Member Info`, stripIndents`
                 Nickname: \`${member.displayName}\`
                 Joined At: \`${new Date(member.joinedAt).toLocaleDateString("en-US")}\`
-                Joined Since : \`${new Date(member.joinedTimestamp).toLocaleTimeString("en-US")}\`
+                Joined Since : \`${humanizeDuration(Date.now() - member.joinedAt, { round: true})}\`
                  `)
-            .addField(`Permissions`, ` ${member.permissions.toArray().map(a => a.toLowerCase()).join(", ").replace(/_/g, " ")}`)
+            .addField(`Permissions`, ` ${member.permissions.has('ADMINISTRATOR') ? 'Administrator (All permissions)' : member.permissions.toArray().map(a => a.toLowerCase()).join(", ").replace(/_/g, " ")}`)
             .addField(`Roles [${roles.length}]`, `${roles.length < 10 ? roles.join(", ") : roles.length > 10 ? await bot.util.trimFromArray(roles, ) : "None"}`)
             .addField(`Acknowledged As`, `${member.id === message.guild.ownerID ? "Server Owner" : member.permissions.has("ADMINISTRATOR") ? "Server Admin" : member.permissions.has(['KICK_MEMBERS', 'BAN_MEMBERS', 'MANAGE_GUILD']) ? "Server Moderator" : "Regular Member"}`)
             .setColor(member.displayHexColor)

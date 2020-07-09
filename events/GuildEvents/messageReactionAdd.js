@@ -1,6 +1,7 @@
 const db = require('quick.db');
 const { MessageEmbed, UserManager, MessageReaction, User, Client } = require('discord.js');
-const ReactionRole = require('../../database/models/ReactionRole')
+const ReactionRole = require('../../database/models/ReactionRole');
+const Giveaway = require("../../database/models/Giveaway");
 const Ticket = require('../../database/models/ticketCommand');
 const TicketConfig = require('../../database/models/ticket')
 /**
@@ -10,7 +11,7 @@ const TicketConfig = require('../../database/models/ticket')
  * @param {Client} bot
  */
 //let ticketar = [ "🔒","🎫","✅","⛔","➕"]
-let ticketar = [`🔒`, `🎫`, `✅`, `⛔`, `➕`]
+let ticketar = [`🔒`, `🎫`, `✅`, `⛔`, `➕`, `🎉`]
 
 module.exports = async(bot, reaction, user) =>{
     if(user.partial) await user.fetch()
@@ -430,6 +431,44 @@ module.exports = async(bot, reaction, user) =>{
                 }
             }
          }
+        })
+    } else if(reaction.emoji.name === '🎉'){
+        if(reaction.partial) await reaction.fetch().catch(console.error);
+        if(reaction.message.partial) await reaction.message.fetch().catch(console.error);
+        const message = reaction.message;
+        Giveaway.findOne({ messageId: message.id, channelId: message.channel.id, guildId: message.guild.id}, async(err, data)=>{
+            if(err) throw err;
+            if(!data) return;
+            else if(data){
+                const { serverreqs, rolereqs} = data;
+                if(serverreqs !== null){
+                    serverreqs.forEach(async(s) =>{
+                        if(!bot.guilds.cache.has(s)) return;
+                        else{
+                            const guild = bot.guilds.cache.get(s);
+                            await guild.members.fetch(user.id).catch(err=>{
+                                return reaction.users.remove(user);
+                            });
+                        }
+                    })
+                }
+                if(rolereqs !== null) {
+                    rolereqs.forEach(async(r)=>{
+                        if(!message.guild.roles.cache.has(r)) return;
+                        else{
+                            const member = message.guild.members.cache.get(user.id);
+                            if(member){
+                               
+
+                                if(!member.roles.cache.has(r)){
+                                    reaction.users.remove(user).catch(console.error)
+                                }
+                            }
+                        }
+                    })
+                }
+                
+            }
         })
     }
 }
